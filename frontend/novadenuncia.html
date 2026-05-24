@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SDU - Nova Denúncia</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="logo">SDU</div>
+
+    <nav class="menu">
+
+        <a href="index.html" class="menu-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+
+        <a href="denuncias.html" class="menu-item">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>Denúncias</span>
+        </a>
+
+        <a href="nova-denuncia.html" class="menu-item active">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nova</span>
+        </a>
+
+        <a href="mapa.html" class="menu-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Mapa</span>
+        </a>
+
+        <a href="orientacoes.html" class="menu-item">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Orientações</span>
+        </a>
+
+    </nav>
+</div>
+
+<!-- CONTEÚDO -->
+<main class="main">
+
+    <div class="page-header">
+        <h1>Nova denúncia</h1>
+        <p class="subtitle">Registre um problema urbano</p>
+    </div>
+
+    <div class="content">
+
+        <form id="form-denuncia" class="card form">
+
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" id="titulo" placeholder="Ex: Buraco na rua" required>
+            </div>
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="descricao" placeholder="Descreva o problema..." required></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="number" id="latitude" placeholder="-23.55" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="number" id="longitude" placeholder="-46.63" required>
+                </div>
+            </div>
+
+            <button class="btn">Enviar denúncia</button>
+
+        </form>
+
+    </div>
+
+</main>
+
+<script src="script.js"></script>
+
+<script>
+document.getElementById("form-denuncia").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const denuncia = {
+        titulo: document.getElementById("titulo").value,
+        descricao: document.getElementById("descricao").value,
+        latitude: parseFloat(document.getElementById("latitude").value),
+        longitude: parseFloat(document.getElementById("longitude").value)
+    };
+
+    try {
+        const res = await fetch("http://127.0.0.1:5000/denuncias/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(denuncia)
+        });
+
+        if (res.ok) {
+            alert("Denúncia enviada com sucesso!");
+            window.location.href = "denuncias.html";
+        } else {
+            alert("Erro ao enviar denúncia.");
+        }
+
+    } catch (err) {
+        alert("Erro de conexão com o servidor.");
+    }
+});
+</script>
+
+</body>
+</html>

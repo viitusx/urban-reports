@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SDU - Mapa</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo">SDU</div>
+
+    <nav class="menu">
+        <a href="index.html" class="menu-item">Home</a>
+        <a href="denuncias.html" class="menu-item">Denúncias</a>
+        <a href="formulario.html" class="menu-item">Nova</a>
+        <a href="mapa.html" class="menu-item active">Mapa</a>
+    </nav>
+</div>
+
+<main class="main">
+    <h1>Mapa</h1>
+    <div id="map"></div>
+</main>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const map = L.map('map').setView([-23.55, -46.63], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+async function carregarDenuncias() {
+    const res = await fetch("http://127.0.0.1:5000/denuncias/");
+    const data = await res.json();
+
+    data.forEach(d => {
+        L.marker([d.latitude, d.longitude])
+            .addTo(map)
+            .bindPopup(`<b>${d.titulo}</b><br>${d.descricao}`);
+    });
+}
+
+carregarDenuncias();
+</script>
+
+</body>
+</html>

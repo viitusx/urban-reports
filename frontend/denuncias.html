@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SDU - Denúncias</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="logo">SDU</div>
+
+    <nav class="menu">
+
+        <a href="index.html" class="menu-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+
+        <a href="denuncias.html" class="menu-item active">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>Denúncias</span>
+        </a>
+
+        <a href="formulario.html" class="menu-item">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nova</span>
+        </a>
+
+        <a href="mapa.html" class="menu-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Mapa</span>
+        </a>
+
+        <a href="orientacoes.html" class="menu-item">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Orientações</span>
+        </a>
+
+    </nav>
+</div>
+
+<!-- CONTEÚDO -->
+<main class="main">
+
+    <div class="page-header">
+        <h1>Denúncias</h1>
+        <p class="subtitle">Veja os problemas reportados pela comunidade</p>
+    </div>
+
+    <div class="content" id="lista-denuncias">
+        <!-- cards vão aparecer aqui -->
+    </div>
+
+</main>
+
+<script src="script.js"></script>
+
+<script>
+async function carregarDenuncias() {
+    const res = await fetch("http://127.0.0.1:5000/denuncias/");
+    const data = await res.json();
+
+    const container = document.getElementById("lista-denuncias");
+    container.innerHTML = "";
+
+    if (data.length === 0) {
+        container.innerHTML = "<p>Nenhuma denúncia encontrada.</p>";
+        return;
+    }
+
+    data.forEach(d => {
+        const div = document.createElement("div");
+        div.classList.add("card");
+
+        div.innerHTML = `
+            <h3>${d.titulo}</h3>
+            <p>${d.descricao}</p>
+            <small>📍 ${d.latitude}, ${d.longitude}</small>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+carregarDenuncias();
+</script>
+
+</body>
+</html>
