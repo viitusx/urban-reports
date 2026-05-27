@@ -1,1 +1,0 @@
-from .denuncia_routes import bp
