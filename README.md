@@ -1,6 +1,6 @@
-# 🚀 Urban Reports (SDU - Sistema de Denúncias Urbanas)
+# Urban Reports (SDU - Sistema de Denúncias Urbanas)
 
-## 📌 Sobre o Projeto
+## Sobre o Projeto
 
 O **SDU (Sistema de Denúncias Urbanas)** é uma aplicação web desenvolvida para facilitar o registro, visualização e acompanhamento de problemas urbanos.
 
@@ -14,7 +14,7 @@ Essas informações são armazenadas em banco de dados e exibidas de forma organ
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 - Promover a participação cidadã
 - Melhorar a comunicação com a gestão pública
@@ -22,7 +22,7 @@ Essas informações são armazenadas em banco de dados e exibidas de forma organ
 
 ---
 
-## 🧠 Modelagem de Dados
+## Modelagem de Dados
 
 ### Entidades principais:
 
@@ -40,7 +40,7 @@ Essas informações são armazenadas em banco de dados e exibidas de forma organ
 
 ---
 
-## 🗄️ Estrutura do Banco de Dados
+## Estrutura do Banco de Dados
 
 ### Exemplo de tabela:
 
@@ -74,7 +74,7 @@ CREATE TABLE denuncia (
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - HTML, CSS e JavaScript
 - SQL (MySQL)
@@ -83,7 +83,7 @@ CREATE TABLE denuncia (
 
 ---
 
-## ▶️ Como executar o projeto
+## Como executar o projeto
 
 1. Clone o repositório:
 
@@ -115,7 +115,7 @@ python run.py
 
 ---
 
-## 🚧 Melhorias futuras
+## Melhorias futuras
 
 - Sistema de autenticação
 - Painel administrativo
@@ -124,6 +124,6 @@ python run.py
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 Projeto desenvolvido por **Victor Silva, Klecius Thiago, Ruan Nicolas, Willian Gabriel**
