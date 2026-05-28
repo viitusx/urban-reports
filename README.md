@@ -1,62 +1,127 @@
-# 🏙️ SDU - Sistema de Denúncias Urbanas
+# 🚀 Urban Reports (SDU - Sistema de Denúncias Urbanas)
 
-O **SDU (Sistema de Denúncias Urbanas)** é uma plataforma web desenvolvida para facilitar o registro, visualização e acompanhamento de problemas urbanos pela população.
+## 📌 Sobre o Projeto
 
----
+O **SDU (Sistema de Denúncias Urbanas)** é uma aplicação web desenvolvida para facilitar o registro, visualização e acompanhamento de problemas urbanos.
 
-## 📌 Funcionalidades
+A plataforma permite que usuários registrem denúncias contendo:
 
-- 📍 Registro de denúncias com localização (latitude e longitude)
-- 📝 Cadastro com título e descrição
-- 📋 Listagem de denúncias
-- 🗺️ Visualização em mapa interativo
-- 💬 Sistema de comentários
-- 🏷️ Classificação por categorias
+* Título
+* Descrição
+* Localização (latitude e longitude)
 
----
-
-## 🧠 Objetivo
-
-O sistema tem como objetivo:
-
-- Promover a participação cidadã
-- Melhorar a comunicação com a gestão pública
-- Organizar informações sobre problemas urbanos
+Essas informações são armazenadas em banco de dados e exibidas de forma organizada, incluindo visualização em mapa interativo.
 
 ---
 
-## 🧱 Estrutura do Projeto
+## 🎯 Objetivo
 
-- Página de listagem de denúncias
-- Página de envio de denúncia
-- Página de mapa interativo
-- Backend com API REST
-
----
-
-## 🗄️ Modelo de Dados
-
-O sistema é composto pelas seguintes entidades:
-
-- **Usuário**
-- **Denúncia**
-- **Comentário**
-- **Categoria**
-
-Relacionamentos:
-- Usuário → Denúncia (1:N)
-- Usuário → Comentário (1:N)
-- Denúncia → Comentário (1:N)
-- Denúncia ↔ Categoria (N:N)
+* Promover a participação cidadã
+* Melhorar a comunicação com a gestão pública
+* Contribuir para cidades mais organizadas
 
 ---
 
-## 🗄️ Exemplo de SQL
+## 🧠 Modelagem de Dados
+
+### Entidades principais:
+
+* **Usuário**
+* **Denúncia**
+* **Comentário**
+* **Categoria**
+
+### Relacionamentos:
+
+* Um usuário pode criar várias denúncias (1:N)
+* Um usuário pode fazer vários comentários (1:N)
+* Uma denúncia pode ter vários comentários (1:N)
+* Uma denúncia pode pertencer a várias categorias (N:N)
+
+---
+
+## 🗄️ Estrutura do Banco de Dados
+
+### Exemplo de tabela:
 
 ```sql
 CREATE TABLE usuario (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100),
-    email VARCHAR(100),
-    senha VARCHAR(255)
-);docs: adiciona README, dicionário de dados, DER e modelo relacional
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(150) UNIQUE NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  tipo VARCHAR(20) DEFAULT 'comum',
+  data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Relacionamento com integridade:
+
+```sql
+CREATE TABLE denuncia (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  titulo VARCHAR(150) NOT NULL,
+  descricao TEXT NOT NULL,
+  latitude DECIMAL(10,8),
+  longitude DECIMAL(11,8),
+  status VARCHAR(30) DEFAULT 'aberta',
+  data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+  usuario_id INT NOT NULL,
+  FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+  ON DELETE CASCADE
+);
+```
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+* HTML, CSS e JavaScript
+* SQL (MySQL)
+* Git & GitHub
+* Leaflet (mapas interativos)
+
+---
+
+## ▶️ Como executar o projeto
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/viitusx/urban-reports.git
+```
+
+2. Abra o projeto:
+
+```bash
+cd urban-reports
+```
+
+3. Execute o frontend:
+
+* Abra o arquivo `index.html` no navegador
+
+---
+
+## 📸 Demonstração
+
+> Adicione aqui prints do projeto:
+
+* DER
+* Código SQL
+* Interface
+
+---
+
+## 🚧 Melhorias futuras
+
+* Sistema de autenticação
+* Painel administrativo
+* API REST completa
+* Notificações em tempo real
+
+---
+
+## 👨‍💻 Autor
+
+Projeto desenvolvido por **Victor Silva, Klecius Thiago, Ruan Nicolas, Willian Gabriel**
