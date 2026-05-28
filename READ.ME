@@ -1,0 +1,62 @@
+# 🏙️ SDU - Sistema de Denúncias Urbanas
+
+O **SDU (Sistema de Denúncias Urbanas)** é uma plataforma web desenvolvida para facilitar o registro, visualização e acompanhamento de problemas urbanos pela população.
+
+---
+
+## 📌 Funcionalidades
+
+- 📍 Registro de denúncias com localização (latitude e longitude)
+- 📝 Cadastro com título e descrição
+- 📋 Listagem de denúncias
+- 🗺️ Visualização em mapa interativo
+- 💬 Sistema de comentários
+- 🏷️ Classificação por categorias
+
+---
+
+## 🧠 Objetivo
+
+O sistema tem como objetivo:
+
+- Promover a participação cidadã
+- Melhorar a comunicação com a gestão pública
+- Organizar informações sobre problemas urbanos
+
+---
+
+## 🧱 Estrutura do Projeto
+
+- Página de listagem de denúncias
+- Página de envio de denúncia
+- Página de mapa interativo
+- Backend com API REST
+
+---
+
+## 🗄️ Modelo de Dados
+
+O sistema é composto pelas seguintes entidades:
+
+- **Usuário**
+- **Denúncia**
+- **Comentário**
+- **Categoria**
+
+Relacionamentos:
+- Usuário → Denúncia (1:N)
+- Usuário → Comentário (1:N)
+- Denúncia → Comentário (1:N)
+- Denúncia ↔ Categoria (N:N)
+
+---
+
+## 🗄️ Exemplo de SQL
+
+```sql
+CREATE TABLE usuario (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    email VARCHAR(100),
+    senha VARCHAR(255)
+);
