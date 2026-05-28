@@ -6,9 +6,9 @@ O **SDU (Sistema de Denúncias Urbanas)** é uma aplicação web desenvolvida pa
 
 A plataforma permite que usuários registrem denúncias contendo:
 
-* Título
-* Descrição
-* Localização (latitude e longitude)
+- Título
+- Descrição
+- Localização (latitude e longitude)
 
 Essas informações são armazenadas em banco de dados e exibidas de forma organizada, incluindo visualização em mapa interativo.
 
@@ -16,9 +16,9 @@ Essas informações são armazenadas em banco de dados e exibidas de forma organ
 
 ## 🎯 Objetivo
 
-* Promover a participação cidadã
-* Melhorar a comunicação com a gestão pública
-* Contribuir para cidades mais organizadas
+- Promover a participação cidadã
+- Melhorar a comunicação com a gestão pública
+- Contribuir para cidades mais organizadas
 
 ---
 
@@ -26,17 +26,17 @@ Essas informações são armazenadas em banco de dados e exibidas de forma organ
 
 ### Entidades principais:
 
-* **Usuário**
-* **Denúncia**
-* **Comentário**
-* **Categoria**
+- **Usuário**
+- **Denúncia**
+- **Comentário**
+- **Categoria**
 
 ### Relacionamentos:
 
-* Um usuário pode criar várias denúncias (1:N)
-* Um usuário pode fazer vários comentários (1:N)
-* Uma denúncia pode ter vários comentários (1:N)
-* Uma denúncia pode pertencer a várias categorias (N:N)
+- Um usuário pode criar várias denúncias (1:N)
+- Um usuário pode fazer vários comentários (1:N)
+- Uma denúncia pode ter vários comentários (1:N)
+- Uma denúncia pode pertencer a várias categorias (N:N)
 
 ---
 
@@ -76,10 +76,10 @@ CREATE TABLE denuncia (
 
 ## 🛠️ Tecnologias Utilizadas
 
-* HTML, CSS e JavaScript
-* SQL (MySQL)
-* Git & GitHub
-* Leaflet (mapas interativos)
+- HTML, CSS e JavaScript
+- SQL (MySQL)
+- Git & GitHub
+- Leaflet (mapas interativos)
 
 ---
 
@@ -97,18 +97,30 @@ git clone https://github.com/viitusx/urban-reports.git
 cd urban-reports
 ```
 
-3. Execute o frontend:
+3. Execute o banco de dados:
 
-* Abra o arquivo `index.html` no navegador
+```bash
+python init_db.py
+```
+
+4. Execute o backend:
+
+```bash
+python run.py
+```
+
+5. Execute o frontend:
+
+- Abra o arquivo `index.html` no navegador
 
 ---
 
 ## 🚧 Melhorias futuras
 
-* Sistema de autenticação
-* Painel administrativo
-* API REST completa
-* Notificações em tempo real
+- Sistema de autenticação
+- Painel administrativo
+- API REST completa
+- Notificações em tempo real
 
 ---
 
