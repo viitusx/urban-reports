@@ -103,16 +103,6 @@ cd urban-reports
 
 ---
 
-## 📸 Demonstração
-
-> Adicione aqui prints do projeto:
-
-* DER
-* Código SQL
-* Interface
-
----
-
 ## 🚧 Melhorias futuras
 
 * Sistema de autenticação
