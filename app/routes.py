@@ -1,128 +1,49 @@
 """
-app/routes.py — Todas as rotas da API de denúncias.
-
-Endpoints disponíveis:
-  GET    /denuncias        → lista todas as denúncias
-  POST   /denuncias        → cria uma nova denúncia
-  PUT    /denuncias/<id>   → atualiza uma denúncia (campos ou status)
-  DELETE /denuncias/<id>   → exclui uma denúncia
+routes.py — Controller
+Responsabilidade: receber requisições HTTP e devolver respostas JSON.
+Não contém regras de negócio nem SQL.
+Delega toda a lógica para o Service.
 """
 
 from flask import Blueprint, request, jsonify
-from .db import get_db
+from .denuncia_service import servico_listar, servico_criar, servico_atualizar, servico_excluir
 
 bp = Blueprint("denuncias", __name__)
 
-# Status permitidos para evitar valores inválidos no banco
-STATUS_VALIDOS = {"aberta", "em_ajuste", "concluida", "nao_houve"}
 
-# Tipos de problema permitidos
-TIPOS_VALIDOS = {"buraco", "fiacao_solta", "alagamento", "outros"}
-
-
-# ── LISTAR ────────────────────────────────────────────────────────────────────
 @bp.route("/denuncias", methods=["GET"])
 def listar():
-    """Retorna todas as denúncias, da mais recente para a mais antiga."""
-    db = get_db()
-    rows = db.execute("SELECT * FROM denuncias ORDER BY data DESC").fetchall()
-    return jsonify([dict(r) for r in rows])
+    denuncias = servico_listar()
+    return jsonify(denuncias)
 
 
-# ── CRIAR ─────────────────────────────────────────────────────────────────────
 @bp.route("/denuncias", methods=["POST"])
 def criar():
-    """Cria uma nova denúncia com os dados enviados no body (JSON)."""
-    dados = request.get_json()
+    try:
+        id_criado = servico_criar(request.get_json())
+        return jsonify({"mensagem": "Denúncia criada!", "id": id_criado}), 201
 
-    # Validação dos campos obrigatórios
-    endereco = (dados.get("endereco") or "").strip()
-    tipo     = (dados.get("tipo") or "").strip()
-
-    if not endereco:
-        return jsonify({"erro": "O campo 'endereço' é obrigatório."}), 400
-
-    if tipo not in TIPOS_VALIDOS:
-        return jsonify({"erro": f"Tipo inválido. Use: {', '.join(TIPOS_VALIDOS)}"}), 400
-
-    db = get_db()
-    db.execute(
-        """
-        INSERT INTO denuncias (endereco, cep, ponto_referencia, tipo, descricao, latitude, longitude)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            endereco,
-            dados.get("cep"),
-            dados.get("ponto_referencia"),
-            tipo,
-            dados.get("descricao"),
-            dados.get("latitude"),
-            dados.get("longitude"),
-        ),
-    )
-    db.commit()
-
-    return jsonify({"mensagem": "Denúncia criada com sucesso!"}), 201
+    except ValueError as erro:
+        # ValueError vem do Service quando os dados são inválidos
+        return jsonify({"erro": str(erro)}), 400
 
 
-# ── ATUALIZAR ─────────────────────────────────────────────────────────────────
 @bp.route("/denuncias/<int:id>", methods=["PUT"])
 def atualizar(id):
-    """Atualiza campos de uma denúncia existente."""
-    db = get_db()
+    try:
+        servico_atualizar(id, request.get_json())
+        return jsonify({"mensagem": "Denúncia atualizada!"})
 
-    # Verifica se a denúncia existe
-    denuncia = db.execute("SELECT id FROM denuncias WHERE id = ?", (id,)).fetchone()
-    if not denuncia:
-        return jsonify({"erro": "Denúncia não encontrada."}), 404
-
-    dados = request.get_json()
-
-    # Monta dinamicamente apenas os campos enviados
-    campos = {}
-
-    if dados.get("endereco", "").strip():
-        campos["endereco"] = dados["endereco"].strip()
-    if "cep" in dados:
-        campos["cep"] = dados["cep"]
-    if "ponto_referencia" in dados:
-        campos["ponto_referencia"] = dados["ponto_referencia"]
-    if dados.get("tipo") in TIPOS_VALIDOS:
-        campos["tipo"] = dados["tipo"]
-    if "descricao" in dados:
-        campos["descricao"] = dados["descricao"]
-    if dados.get("status") in STATUS_VALIDOS:
-        campos["status"] = dados["status"]
-    if "latitude" in dados:
-        campos["latitude"] = dados["latitude"]
-    if "longitude" in dados:
-        campos["longitude"] = dados["longitude"]
-
-    if not campos:
-        return jsonify({"erro": "Nenhum campo válido para atualizar."}), 400
-
-    # Monta a query UPDATE com os campos recebidos
-    set_sql = ", ".join(f"{k} = ?" for k in campos)
-    valores = list(campos.values()) + [id]
-
-    db.execute(f"UPDATE denuncias SET {set_sql} WHERE id = ?", valores)
-    db.commit()
-
-    return jsonify({"mensagem": "Denúncia atualizada com sucesso!"})
+    except ValueError as erro:
+        status = 404 if "não encontrada" in str(erro) else 400
+        return jsonify({"erro": str(erro)}), status
 
 
-# ── EXCLUIR ───────────────────────────────────────────────────────────────────
 @bp.route("/denuncias/<int:id>", methods=["DELETE"])
 def excluir(id):
-    """Exclui uma denúncia pelo ID."""
-    db = get_db()
+    try:
+        servico_excluir(id)
+        return jsonify({"mensagem": "Denúncia excluída!"})
 
-    denuncia = db.execute("SELECT id FROM denuncias WHERE id = ?", (id,)).fetchone()
-    if not denuncia:
-        return jsonify({"erro": "Denúncia não encontrada."}), 404
-
-    db.execute("DELETE FROM denuncias WHERE id = ?", (id,))
-    db.commit()
-
-    return jsonify({"mensagem": "Denúncia excluída com sucesso!"})
+    except ValueError as erro:
+        return jsonify({"erro": str(erro)}), 404

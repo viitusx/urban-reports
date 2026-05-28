@@ -200,7 +200,7 @@
           badge.className = `badge badge-${novoStatus}`;
           badge.textContent = ROTULO_STATUS[novoStatus];
 
-          mostrarToast("Status atualizado! ✅");
+          mostrarToast("Status atualizado!");
         } catch (erro) {
           mostrarToast("Erro ao atualizar status.");
         }
@@ -229,7 +229,7 @@
 
         try {
           await atualizarDenuncia(id, dados);
-          mostrarToast("Denúncia atualizada! ✅");
+          mostrarToast("Denúncia atualizada!");
           carregarDenuncias();
         } catch (erro) {
           mostrarToast("Erro ao salvar edição.");
@@ -251,7 +251,7 @@
             carregarDenuncias();
           }
 
-          mostrarToast("Denúncia excluída. 🗑️");
+          mostrarToast("Denúncia excluída.");
         } catch (erro) {
           mostrarToast("Erro ao excluir denúncia.");
         }
