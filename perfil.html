@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SDU — Meu Perfil</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fa-solid fa-eye"></i>
+          <span class="logo-text">SDU</span>
+        </div>
+        <button class="menu-toggle" id="menuToggle" title="Recolher menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+      <nav class="menu">
+        <a href="index.html" class="menu-item" data-label="Início">
+          <i class="fa-solid fa-house"></i>
+          <span>Início</span>
+        </a>
+        <a href="denuncias.html" class="menu-item" data-label="Suas Denúncias">
+          <i class="fa-solid fa-bullhorn"></i>
+          <span>Suas Denúncias</span>
+        </a>
+        <a
+          href="nova-denuncia.html"
+          class="menu-item"
+          data-label="Nova Denúncia"
+        >
+          <i class="fa-solid fa-plus"></i>
+          <span>Faça Nova Denúncia</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer"><span>SDU © 2026</span></div>
+    </aside>
+
+    <main class="main">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <span class="topbar-titulo">Meu Perfil</span>
+        <div class="topbar-acoes">
+          <span id="nome-usuario" class="topbar-nome"></span>
+          <a href="perfil.html" class="topbar-icon active" title="Perfil">
+            <i class="fa-solid fa-circle-user"></i>
+          </a>
+          <button class="topbar-icon" onclick="sair()" title="Sair">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="perfil-page">
+        <!-- Card de identidade do usuário -->
+        <div class="perfil-header">
+          <div class="perfil-avatar" id="perfil-iniciais"></div>
+          <div>
+            <h2 id="perfil-nome"></h2>
+            <p id="perfil-email"></p>
+            <small id="perfil-membro"></small>
+          </div>
+        </div>
+
+        <!-- Denúncias agrupadas por status -->
+        <div class="perfil-grupos" id="perfil-grupos">
+          <p style="color: #aaa">Carregando...</p>
+        </div>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      const ROTULO_TIPO = {
+        buraco: "Buraco",
+        fiacao_solta: "Fiação solta",
+        alagamento: "Alagamento",
+        outros: "Outros",
+      };
+
+      const GRUPOS_STATUS = [
+        { key: "aberta", label: "Abertas", classe: "badge-aberta" },
+        { key: "em_ajuste", label: "Em Ajuste", classe: "badge-em_ajuste" },
+        { key: "concluida", label: "Concluídas", classe: "badge-concluida" },
+        { key: "nao_houve", label: "Não Houve", classe: "badge-nao_houve" },
+      ];
+
+      async function iniciar() {
+        const usuario = await verificarAuth();
+        if (!usuario) return;
+
+        // Preenche os dados do perfil
+        document.getElementById("perfil-nome").textContent = usuario.nome;
+        document.getElementById("perfil-email").textContent = usuario.email;
+        document.getElementById("perfil-iniciais").textContent = usuario.nome
+          .split(" ")
+          .map((p) => p[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase();
+
+        const membro = new Date(usuario.data_cadastro).toLocaleDateString(
+          "pt-BR",
+          {
+            month: "long",
+            year: "numeric",
+          },
+        );
+        document.getElementById("perfil-membro").textContent =
+          `Membro desde ${membro}`;
+
+        // Carrega e agrupa as denúncias
+        const lista = await buscarDenuncias();
+        const container = document.getElementById("perfil-grupos");
+        container.innerHTML = "";
+
+        GRUPOS_STATUS.forEach(({ key, label, classe }) => {
+          const grupo = lista.filter((d) => d.status === key);
+
+          const secao = document.createElement("div");
+          secao.className = "perfil-secao";
+          secao.innerHTML = `
+                <div class="perfil-secao-header">
+                    <span class="badge ${classe}">${label}</span>
+                    <span class="perfil-count">${grupo.length}</span>
+                </div>
+                <div class="perfil-lista">
+                    ${
+                      grupo.length === 0
+                        ? `<p class="perfil-vazio">Nenhuma denúncia nesta categoria.</p>`
+                        : grupo
+                            .map(
+                              (d) => `
+                            <!-- Clicando aqui o usuário vai para a lista completa -->
+                            <a href="denuncias.html" class="perfil-item">
+                                <span class="perfil-item-tipo">${ROTULO_TIPO[d.tipo] || d.tipo}</span>
+                                <span class="perfil-item-end">
+                                    <i class="fa-solid fa-location-dot" style="color:var(--accent);font-size:11px"></i>
+                                    ${d.endereco}
+                                </span>
+                            </a>
+                        `,
+                            )
+                            .join("")
+                    }
+                </div>
+            `;
+          container.appendChild(secao);
+        });
+      }
+
+      iniciar();
+    </script>
+  </body>
+</html>

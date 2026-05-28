@@ -1,49 +1,67 @@
 """
-routes.py — Controller
+routes.py — Controller de denúncias.
 Responsabilidade: receber requisições HTTP e devolver respostas JSON.
-Não contém regras de negócio nem SQL.
-Delega toda a lógica para o Service.
+Todas as rotas exigem que o usuário esteja autenticado.
 """
-
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from .denuncia_service import servico_listar, servico_criar, servico_atualizar, servico_excluir
 
 bp = Blueprint("denuncias", __name__)
 
 
+def usuario_logado():
+    """Retorna o id do usuário na sessão, ou None se não estiver logado."""
+    return session.get("usuario_id")
+
+
 @bp.route("/denuncias", methods=["GET"])
 def listar():
-    denuncias = servico_listar()
-    return jsonify(denuncias)
+    uid = usuario_logado()
+    if not uid:
+        return jsonify({"erro": "Não autenticado."}), 401
+
+    return jsonify(servico_listar(uid))
 
 
 @bp.route("/denuncias", methods=["POST"])
 def criar():
-    try:
-        id_criado = servico_criar(request.get_json())
-        return jsonify({"mensagem": "Denúncia criada!", "id": id_criado}), 201
+    uid = usuario_logado()
+    if not uid:
+        return jsonify({"erro": "Não autenticado."}), 401
 
-    except ValueError as erro:
-        # ValueError vem do Service quando os dados são inválidos
-        return jsonify({"erro": str(erro)}), 400
+    try:
+        id_criado = servico_criar(request.get_json(), uid)
+        return jsonify({"mensagem": "Denúncia criada!", "id": id_criado}), 201
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 400
 
 
 @bp.route("/denuncias/<int:id>", methods=["PUT"])
 def atualizar(id):
-    try:
-        servico_atualizar(id, request.get_json())
-        return jsonify({"mensagem": "Denúncia atualizada!"})
+    uid = usuario_logado()
+    if not uid:
+        return jsonify({"erro": "Não autenticado."}), 401
 
-    except ValueError as erro:
-        status = 404 if "não encontrada" in str(erro) else 400
-        return jsonify({"erro": str(erro)}), status
+    try:
+        servico_atualizar(id, request.get_json(), uid)
+        return jsonify({"mensagem": "Denúncia atualizada!"})
+    except PermissionError as e:
+        return jsonify({"erro": str(e)}), 403
+    except ValueError as e:
+        status = 404 if "não encontrada" in str(e) else 400
+        return jsonify({"erro": str(e)}), status
 
 
 @bp.route("/denuncias/<int:id>", methods=["DELETE"])
 def excluir(id):
-    try:
-        servico_excluir(id)
-        return jsonify({"mensagem": "Denúncia excluída!"})
+    uid = usuario_logado()
+    if not uid:
+        return jsonify({"erro": "Não autenticado."}), 401
 
-    except ValueError as erro:
-        return jsonify({"erro": str(erro)}), 404
+    try:
+        servico_excluir(id, uid)
+        return jsonify({"mensagem": "Denúncia excluída!"})
+    except PermissionError as e:
+        return jsonify({"erro": str(e)}), 403
+    except ValueError as e:
+        return jsonify({"erro": str(e)}), 404

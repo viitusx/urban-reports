@@ -52,6 +52,19 @@
     </aside>
 
     <main class="main">
+      <!-- TOPBAR com nome do usuário e ícone de perfil -->
+      <div class="topbar">
+        <span class="topbar-titulo">Suas Denúncias</span>
+        <div class="topbar-acoes">
+          <span id="nome-usuario" class="topbar-nome"></span>
+          <a href="perfil.html" class="topbar-icon" title="Meu Perfil">
+            <i class="fa-solid fa-circle-user"></i>
+          </a>
+          <button class="topbar-icon" onclick="sair()" title="Sair">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
       <div class="denuncias-page">
         <div class="page-header">
           <h1>Suas Denúncias</h1>
@@ -257,6 +270,7 @@
         }
       }
 
+      verificarAuth();
       carregarDenuncias();
     </script>
   </body>

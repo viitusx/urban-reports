@@ -1,16 +1,17 @@
 """
-denuncia_model.py — Model
+denuncia_model.py — Model de denúncias.
 Responsabilidade: executar os comandos SQL no banco de dados.
-Não sabe nada sobre HTTP, validação ou regras de negócio.
 """
-
 from .db import get_db
 
 
-def db_listar():
-    """Retorna todas as denúncias ordenadas pela mais recente."""
+def db_listar(usuario_id):
+    """Retorna todas as denúncias do usuário logado."""
     db = get_db()
-    rows = db.execute("SELECT * FROM denuncias ORDER BY data DESC").fetchall()
+    rows = db.execute(
+        "SELECT * FROM denuncias WHERE usuario_id = ? ORDER BY data DESC",
+        (usuario_id,)
+    ).fetchall()
     return [dict(r) for r in rows]
 
 
@@ -21,13 +22,14 @@ def db_buscar_por_id(id):
     return dict(row) if row else None
 
 
-def db_criar(dados):
-    """Insere uma nova denúncia no banco e retorna o id gerado."""
+def db_criar(dados, usuario_id):
+    """Insere uma nova denúncia vinculada ao usuário logado."""
     db = get_db()
     cursor = db.execute(
         """
-        INSERT INTO denuncias (endereco, cep, ponto_referencia, tipo, descricao, latitude, longitude)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO denuncias
+            (endereco, cep, ponto_referencia, tipo, descricao, latitude, longitude, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             dados["endereco"],
@@ -37,27 +39,24 @@ def db_criar(dados):
             dados.get("descricao"),
             dados.get("latitude"),
             dados.get("longitude"),
+            usuario_id,
         ),
     )
     db.commit()
-    return cursor.lastrowid  # id gerado automaticamente pelo banco
+    return cursor.lastrowid
 
 
 def db_atualizar(id, campos):
-    """Atualiza apenas os campos recebidos na denúncia de determinado id."""
+    """Atualiza apenas os campos recebidos da denúncia de determinado id."""
     db = get_db()
-
-    # Monta o SET dinamicamente com apenas os campos enviados
-    # ex: campos = {"status": "concluida"} → "status = ?"
     set_sql = ", ".join(f"{k} = ?" for k in campos)
     valores = list(campos.values()) + [id]
-
     db.execute(f"UPDATE denuncias SET {set_sql} WHERE id = ?", valores)
     db.commit()
 
 
 def db_excluir(id):
-    """Remove a denúncia de determinado id do banco."""
+    """Remove a denúncia pelo id."""
     db = get_db()
     db.execute("DELETE FROM denuncias WHERE id = ?", (id,))
     db.commit()

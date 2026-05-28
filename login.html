@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDU — Entrar</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="login-body">
+
+<div class="login-container">
+
+    <!-- Logo -->
+    <div class="login-logo">
+        <i class="fa-solid fa-eye"></i>
+        <span>SDU</span>
+    </div>
+    <p class="login-tagline">Sistema de Denúncias Urbanas</p>
+
+    <!-- Abas Login / Cadastro -->
+    <div class="login-tabs">
+        <button class="tab-btn active" onclick="mostrarAba('login')">Entrar</button>
+        <button class="tab-btn"        onclick="mostrarAba('cadastro')">Criar conta</button>
+    </div>
+
+    <!-- Formulário de Login -->
+    <div id="aba-login">
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="login-email" placeholder="seu@email.com">
+        </div>
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="login-senha" placeholder="••••••">
+        </div>
+        <p class="login-erro" id="login-erro"></p>
+        <button class="btn-login" onclick="fazerLogin()">
+            <i class="fa-solid fa-right-to-bracket"></i> Entrar
+        </button>
+    </div>
+
+    <!-- Formulário de Cadastro -->
+    <div id="aba-cadastro" style="display:none">
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" id="cad-nome" placeholder="Seu nome completo">
+        </div>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="cad-email" placeholder="seu@email.com">
+        </div>
+        <div class="form-group">
+            <label>Senha <span style="font-weight:400;font-size:12px;color:#aaa">(mín. 6 caracteres)</span></label>
+            <input type="password" id="cad-senha" placeholder="••••••">
+        </div>
+        <p class="login-erro" id="cad-erro"></p>
+        <button class="btn-login" onclick="fazerCadastro()">
+            <i class="fa-solid fa-user-plus"></i> Criar conta
+        </button>
+    </div>
+
+</div>
+
+<script>
+    const API = "http://127.0.0.1:5000";
+
+    // Se já estiver logado, vai direto para o inicio
+    fetch(`${API}/auth/me`, { credentials: "include" })
+        .then(r => { if (r.ok) window.location.href = "index.html"; })
+        .catch(() => {});
+
+    function mostrarAba(aba) {
+        document.getElementById("aba-login").style.display    = aba === "login"    ? "block" : "none";
+        document.getElementById("aba-cadastro").style.display = aba === "cadastro" ? "block" : "none";
+        document.querySelectorAll(".tab-btn").forEach((btn, i) => {
+            btn.classList.toggle("active", (i === 0) === (aba === "login"));
+        });
+    }
+
+    async function fazerLogin() {
+        const email = document.getElementById("login-email").value.trim();
+        const senha = document.getElementById("login-senha").value;
+        const erro  = document.getElementById("login-erro");
+        erro.textContent = "";
+
+        try {
+            const resp = await fetch(`${API}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email, senha }),
+            });
+
+            const data = await resp.json();
+            if (!resp.ok) { erro.textContent = data.erro; return; }
+
+            window.location.href = "index.html";
+        } catch {
+            erro.textContent = "Erro de conexão com o servidor.";
+        }
+    }
+
+    async function fazerCadastro() {
+        const nome  = document.getElementById("cad-nome").value.trim();
+        const email = document.getElementById("cad-email").value.trim();
+        const senha = document.getElementById("cad-senha").value;
+        const erro  = document.getElementById("cad-erro");
+        erro.textContent = "";
+
+        try {
+            const resp = await fetch(`${API}/auth/registro`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ nome, email, senha }),
+            });
+
+            const data = await resp.json();
+            if (!resp.ok) { erro.textContent = data.erro; return; }
+
+            window.location.href = "index.html";
+        } catch {
+            erro.textContent = "Erro de conexão com o servidor.";
+        }
+    }
+
+    // Permite submeter com Enter
+    document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        const abaLogin = document.getElementById("aba-login").style.display !== "none";
+        abaLogin ? fazerLogin() : fazerCadastro();
+    });
+</script>
+
+</body>
+</html>

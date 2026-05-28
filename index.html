@@ -46,6 +46,20 @@
 <!-- ── CONTEÚDO PRINCIPAL ─────────────────────────────────── -->
 <main class="main">
 
+    <!-- TOPBAR com nome do usuário e ícone de perfil -->
+    <div class="topbar">
+        <span class="topbar-titulo">Início</span>
+        <div class="topbar-acoes">
+            <span id="nome-usuario" class="topbar-nome"></span>
+            <a href="perfil.html" class="topbar-icon" title="Meu Perfil">
+                <i class="fa-solid fa-circle-user"></i>
+            </a>
+            <button class="topbar-icon" onclick="sair()" title="Sair">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- SEÇÃO 1: HERO -->
     <section class="hero-section">
         <h1 class="hero-title">SDU</h1>
@@ -102,6 +116,7 @@
 <script src="script.js"></script>
 <script>
     /* Scroll suave até a seção "Quem Somos" ao clicar no botão */
+    verificarAuth();
     function irParaQuemSomos() {
         document.getElementById("quem-somos").scrollIntoView({ behavior: "smooth" });
     }

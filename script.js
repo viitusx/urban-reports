@@ -1,117 +1,120 @@
 /* ============================================================
-   script.js — SDU Sistema de Denúncias Urbanas
-   Funções compartilhadas entre todas as páginas.
+   script.js — SDU | Funções compartilhadas entre todas as páginas
    ============================================================ */
 
+const API = "http://127.0.0.1:5000";
+
+
 // ── SIDEBAR ──────────────────────────────────────────────────
-const sidebar      = document.getElementById("sidebar");
-const menuToggle   = document.getElementById("menuToggle");
+const sidebar    = document.getElementById("sidebar");
+const menuToggle = document.getElementById("menuToggle");
 
 if (sidebar) {
-
-    // Clique no botão hambúrguer → recolhe (sidebar aberta)
     if (menuToggle) {
         menuToggle.addEventListener("click", (e) => {
-            e.stopPropagation(); // não dispara o listener da sidebar
+            e.stopPropagation();
             sidebar.classList.add("collapsed");
         });
     }
 
-    // Clique em qualquer lugar da sidebar → expande (sidebar recolhida)
     sidebar.addEventListener("click", () => {
         if (sidebar.classList.contains("collapsed")) {
             sidebar.classList.remove("collapsed");
         }
     });
 
-    // Impede que cliques nos itens do menu também disparem o toggle
     sidebar.querySelectorAll(".menu-item").forEach(item => {
-        item.addEventListener("click", (e) => {
-            e.stopPropagation();
-        });
+        item.addEventListener("click", e => e.stopPropagation());
     });
 }
 
 
-// ── TOAST (notificação rápida) ───────────────────────────────
+// ── AUTENTICAÇÃO ─────────────────────────────────────────────
 /**
- * Exibe uma mensagem temporária no canto inferior direito.
- * @param {string} msg    - Texto da mensagem.
- * @param {number} duracao - Tempo em ms (padrão: 3000).
+ * Verifica se o usuário está logado consultando a sessão no servidor.
+ * Se não estiver, redireciona para login.html.
+ * Retorna os dados do usuário para uso na página.
  */
+async function verificarAuth() {
+    try {
+        const resp = await fetch(`${API}/auth/me`, { credentials: "include" });
+
+        if (resp.status === 401) {
+            window.location.href = "login.html";
+            return null;
+        }
+
+        const usuario = await resp.json();
+
+        // Exibe o nome do usuário na topbar, se o elemento existir
+        const elNome = document.getElementById("nome-usuario");
+        if (elNome) elNome.textContent = usuario.nome;
+
+        return usuario;
+    } catch {
+        window.location.href = "login.html";
+        return null;
+    }
+}
+
+async function sair() {
+    await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
+    window.location.href = "login.html";
+}
+
+
+// ── TOAST (notificação rápida) ───────────────────────────────
 function mostrarToast(msg, duracao = 3000) {
     let toast = document.getElementById("toast");
-
-    // Cria o elemento se ainda não existir
     if (!toast) {
         toast = document.createElement("div");
         toast.id = "toast";
         toast.className = "toast";
         document.body.appendChild(toast);
     }
-
     toast.textContent = msg;
     toast.classList.add("mostrar");
-
-    setTimeout(() => {
-        toast.classList.remove("mostrar");
-    }, duracao);
+    setTimeout(() => toast.classList.remove("mostrar"), duracao);
 }
 
 
 // ── UTILITÁRIOS DE API ───────────────────────────────────────
-const API = "http://127.0.0.1:5000";
-
-/**
- * Busca todas as denúncias da API.
- * @returns {Promise<Array>} Lista de denúncias.
- */
 async function buscarDenuncias() {
-    const resposta = await fetch(`${API}/denuncias`);
-    if (!resposta.ok) throw new Error("Erro ao buscar denúncias.");
-    return resposta.json();
+    const resp = await fetch(`${API}/denuncias`, { credentials: "include" });
+    if (!resp.ok) throw new Error("Erro ao buscar denúncias.");
+    return resp.json();
 }
 
-/**
- * Cria uma nova denúncia.
- * @param {Object} dados - Campos da denúncia.
- */
 async function criarDenuncia(dados) {
-    const resposta = await fetch(`${API}/denuncias`, {
+    const resp = await fetch(`${API}/denuncias`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(dados),
     });
-    if (!resposta.ok) {
-        const erro = await resposta.json();
+    if (!resp.ok) {
+        const erro = await resp.json();
         throw new Error(erro.erro || "Erro ao criar denúncia.");
     }
-    return resposta.json();
+    return resp.json();
 }
 
-/**
- * Atualiza campos de uma denúncia existente.
- * @param {number} id    - ID da denúncia.
- * @param {Object} dados - Campos a atualizar.
- */
 async function atualizarDenuncia(id, dados) {
-    const resposta = await fetch(`${API}/denuncias/${id}`, {
+    const resp = await fetch(`${API}/denuncias/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(dados),
     });
-    if (!resposta.ok) throw new Error("Erro ao atualizar denúncia.");
-    return resposta.json();
+    if (!resp.ok) throw new Error("Erro ao atualizar denúncia.");
+    return resp.json();
 }
 
-/**
- * Exclui uma denúncia.
- * @param {number} id - ID da denúncia.
- */
 async function excluirDenuncia(id) {
-    const resposta = await fetch(`${API}/denuncias/${id}`, {
+    const resp = await fetch(`${API}/denuncias/${id}`, {
         method: "DELETE",
+        credentials: "include",
     });
-    if (!resposta.ok) throw new Error("Erro ao excluir denúncia.");
-    return resposta.json();
+    if (!resp.ok) throw new Error("Erro ao excluir denúncia.");
+    return resp.json();
 }

@@ -97,19 +97,25 @@ git clone https://github.com/viitusx/urban-reports.git
 cd urban-reports
 ```
 
-3. Execute o banco de dados:
+3. Baixe as dependências:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Execute o banco de dados:
 
 ```bash
 python init_db.py
 ```
 
-4. Execute o backend:
+5. Execute o backend:
 
 ```bash
 python run.py
 ```
 
-5. Execute o frontend:
+6. Execute o frontend:
 
 - Abra o arquivo `index.html` no navegador
 
